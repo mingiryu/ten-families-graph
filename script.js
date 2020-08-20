@@ -8,7 +8,7 @@ var ENABLE_PARTICLES = false;
 var COLOR_TYPE = 'kindred';
 
 
-fetch('./TenFamiliesGraph.json').then(res => res.json()).then(data => {
+fetch('./data/TenFamiliesGraph.json').then(res => res.json()).then(data => {
     DATA = data;
     const elem = document.getElementById('graph');
 
