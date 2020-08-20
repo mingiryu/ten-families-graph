@@ -1,0 +1,46 @@
+<head>
+  <link href='style.css' rel='stylesheet'>
+  <link href="https://unpkg.com/bonsai.css@latest/dist/bonsai-base.min.css" rel="stylesheet">
+
+  <script src="//unpkg.com/force-graph"></script>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="script.js"></script>
+</head>
+
+<body>
+  <div id='tooltip'>
+    <span>Click any node to view attributes</span>
+  </div>
+
+  <div id='control'>
+    <div>
+      <button onclick=handleParticles()>Toggle Particles</button>
+      <button onclick=handleZoomToFit()>Zoom To Fit</button>
+      <button onclick=handleReheat()>Reheat Animation</button>
+    </div>
+
+    <div>
+      <label for='color'>Color by:</label>
+      <select name='color' , onchange=handleColor(value)>
+        <option value='kindred' selected>Kindred</option>
+        <option value='sex'>Sex</option>
+        <option value='deceased'>Deceased</option>
+        <option value='gen'>Generation</option>
+        <option value='suicide'>Suicide</option>
+      </select>
+    </div>
+
+    <div>
+      <label for='filter'>Filter by:</label>
+      <select name='filter' , onchange=handleFilter(value)>
+        <option value='' selected>None</option>
+        <option value='38'>38</option>
+        <option value='176860'>176860</option>
+      </select>
+    </div>
+
+
+  </div>
+
+  <div id="graph"></div>
+</body>

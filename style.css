@@ -1,0 +1,36 @@
+body {
+    margin: 0;
+}
+
+#tooltip {
+    z-index: 1000;
+    position: absolute;
+    top: 0;
+    margin: 1em;
+    padding: 0.5em 1em;
+    border-radius: 1em;
+    opacity: 0.9;
+    color: white;
+    background: #5D5D5D;
+}
+
+#control {
+    z-index: 1000;
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0.9;
+    color: white;
+    margin: 1em;
+    padding: 0.5em 1em;
+    border-radius: 5%;
+    background: #5D5D5D;
+    }
+
+button {
+    display: block;
+}
+
+p {
+    line-height: 1em;
+}
