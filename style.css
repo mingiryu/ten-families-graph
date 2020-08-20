@@ -19,13 +19,14 @@ body {
     position: absolute;
     top: 0;
     right: 0;
+    margin: 1em;
+    padding:0.5em 1em 1em 1em;
+    border-radius: 1em;
     opacity: 0.9;
     color: white;
-    margin: 1em;
-    padding: 0.5em 1em;
-    border-radius: 5%;
     background: #5D5D5D;
-    }
+    max-width: 300px;
+}
 
 button {
     display: block;

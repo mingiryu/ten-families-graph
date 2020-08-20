@@ -1,15 +1,20 @@
 <head>
+
   <link href='style.css' rel='stylesheet'>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.0/semantic.min.css">
   <link href="https://unpkg.com/bonsai.css@latest/dist/bonsai-base.min.css" rel="stylesheet">
 
   <script src="//unpkg.com/force-graph"></script>
   <script src="https://d3js.org/d3.v5.min.js"></script>
-  <script src="script.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.0/semantic.min.js"></script>
+  <script src="script.js" defer></script>
+
 </head>
 
 <body>
   <div id='tooltip'>
-    <span>Click any node to view attributes</span>
+    <span>Click on any node to view attributes</span>
   </div>
 
   <div id='control'>
@@ -21,7 +26,7 @@
 
     <div>
       <label for='color'>Color by:</label>
-      <select name='color' , onchange=handleColor(value)>
+      <select id='select-color' name='color' class="ui fluid search dropdown">
         <option value='kindred' selected>Kindred</option>
         <option value='sex'>Sex</option>
         <option value='deceased'>Deceased</option>
@@ -31,13 +36,22 @@
     </div>
 
     <div>
-      <label for='filter'>Filter by:</label>
-      <select name='filter' , onchange=handleFilter(value)>
-        <option value='' selected>None</option>
-        <option value='38'>38</option>
-        <option value='176860'>176860</option>
+      <br>
+      <p>Filter by:</labpel>
+      <select id='select-kindred' class="ui fluid search dropdown" multiple>
+        <option value='' selected>Kindred</option>
+        <option value=38>38</option>
+        <option value=149>149</option>
+        <option value=27251>27251</option>
+        <option value=42623>42623</option>
+        <option value=68939>68939</option>
+        <option value=176860>176860</option>
+        <option value=603481>603481</option>
+        <option value=791533>791533</option>
+        <option value=903988>903988</option>
       </select>
     </div>
+
 
 
   </div>

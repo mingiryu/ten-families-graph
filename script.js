@@ -1,5 +1,7 @@
 
 
+const KINDRED_IDS = [38, 149, 27251, 42623, 68939, 176860, 603481, 791533, 903988];
+
 const NODE_R = 10;
 
 var GRAPH;
@@ -56,8 +58,6 @@ fetch('./data/TenFamiliesGraph.json').then(res => res.json()).then(data => {
             GRAPH.centerAt(node.x, node.y, 1000);
             GRAPH.zoom(1, 2000);
 
-            updateTooltip(node);
-
             // Select multiple nodes
             if (event.ctrlKey || event.shiftKey || event.altKey) { // multi-selection
                 selectedNodes.has(node) ? selectedNodes.delete(node) : selectedNodes.add(node);
@@ -68,6 +68,8 @@ fetch('./data/TenFamiliesGraph.json').then(res => res.json()).then(data => {
             }
 
             GRAPH.nodeColor(GRAPH.nodeColor()); // update color of selected nodes
+
+            updateTooltip(node, selectedNodes);
         })
         .onNodeDrag((node, translate) => {
             if (selectedNodes.has(node)) { // moving a selected node
@@ -111,8 +113,7 @@ const getNodeColor = (node) => {
         return blues[node.gen - 1]
     } else if (COLOR_TYPE === 'kindred') {
         const accent = d3.schemeAccent;
-        const kindreds = [38, 149, 27251, 42623, 68939, 176860, 603481, 791533, 903988];
-        return accent[kindreds.indexOf(node.KindredID)]
+        return accent[KINDRED_IDS.indexOf(node.KindredID)]
     } else {
         const accent = d3.schemeAccent;
         return accent[node.group]
@@ -142,7 +143,7 @@ const handleZoomToFit = () => {
 }
 
 
-const handleColor = (value) => {
+const handleColor = (value, text, $selectedItem) => {
     COLOR_TYPE = value
 }
 
@@ -152,11 +153,12 @@ const handleReheat = () => {
 }
 
 
-const handleFilter = (value) => {
-    if (value) {
-        nodes = DATA['nodes'].filter(d => d['KindredID'] == value)
-        nodeSet = new Set(nodes.map(d => d.id));
-        links = DATA['links'].filter(d => nodeSet.has(d['source']['id']) && nodeSet.has(d['target']['id']))
+const handleKindred = (value, text, $selectedItem) => {
+    value = new Set(value.map(v => +v));
+    if (value.size && value.size < KINDRED_IDS.length) {
+        nodes = DATA['nodes'].filter(d => value.has(d['KindredID']))
+        nodeIDs = new Set(nodes.map(d => d.id));
+        links = DATA['links'].filter(d => nodeIDs.has(d['source']['id']) && nodeIDs.has(d['target']['id']))
         GRAPH.graphData({ nodes, links });
     } else {
         GRAPH.graphData(DATA);
@@ -164,8 +166,21 @@ const handleFilter = (value) => {
 }
 
 
-const updateTooltip = (node) => {
+const updateTooltip = (node, selectedNodes) => {
+    console.log(selectedNodes)
     const tooltip = document.getElementById('tooltip');
     const metadata = new Set(['id', '__indexColor', 'index', 'x', 'y', 'vx', 'vy'])
     tooltip.innerHTML = Object.keys(node).map(key => node[key] && !metadata.has(key) ? `<p>${key}: ${node[key]}</p>` : '').join('');
 }
+
+/** Semantic UI */
+
+$('#select-color')
+    .dropdown({
+        onChange: handleColor
+    });
+
+$('#select-kindred')
+    .dropdown({
+        onChange: handleKindred
+    });
