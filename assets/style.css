@@ -2,16 +2,34 @@ body {
     margin: 0;
 }
 
-#tooltip {
+#overlay-container {
+    z-index: 1000;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+#info {
     z-index: 1000;
     position: absolute;
-    top: 0;
+    background: #5D5D5D;
     margin: 1em;
     padding: 0.5em 1em;
     border-radius: 1em;
     opacity: 0.9;
     color: white;
-    background: #5D5D5D;
+}
+
+#table {
+    z-index: 1000;
+    display: none;
+    justify-self: center;
+    align-self: flex-end;
+    position: absolute;
+    bottom: 0;
+    margin: auto;
+    padding-bottom: 1em;
+    opacity: 0.9;
 }
 
 #control {
@@ -30,8 +48,4 @@ body {
 
 button {
     display: block;
-}
-
-p {
-    line-height: 1em;
 }

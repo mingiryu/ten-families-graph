@@ -1,20 +1,41 @@
 <head>
 
-  <link href='style.css' rel='stylesheet'>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.0/semantic.min.css">
-  <link href="https://unpkg.com/bonsai.css@latest/dist/bonsai-base.min.css" rel="stylesheet">
+  <link href="assets/style.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.0/semantic.min.css" rel="stylesheet">
+  <link href="assets/bonsai-base.min.css" rel="stylesheet">
 
-  <script src="//unpkg.com/force-graph"></script>
-  <script src="https://d3js.org/d3.v5.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.0/semantic.min.js"></script>
-  <script src="script.js" defer></script>
+  <script src="assets/force-graph.min.js"></script>
+  <script src="assets/d3.v5.min.js"></script>
+  <script src="assets/jquery.min.js"></script>
+  <script src="assets/semantic.min.js"></script>
+  <script src="assets/tablesort.js"></script>
+  <script src="assets/script.js" defer></script>
 
 </head>
 
 <body>
-  <div id='tooltip'>
-    <span>Click on any node to view attributes</span>
+  <div id="overlay-container">
+    <span id="info">Click on a node to view its attributes</span>
+
+    <div id="table">
+      <table class="ui celled table very compact sortable">
+        <thead id="thead">
+          <tr>
+            <th>personid</th>
+            <th>KindredID</th>
+            <th>MaID</th>
+            <th>PaID</th>
+            <th>sex</th>
+            <th>deceased</th>
+            <th>suicide</th>
+            <th>bdate</th>
+            <th>ddate</th>
+            <th>gen</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
   </div>
 
   <div id='control'>
@@ -22,33 +43,46 @@
       <button onclick=handleParticles()>Toggle Particles</button>
       <button onclick=handleZoomToFit()>Zoom To Fit</button>
       <button onclick=handleReheat()>Reheat Animation</button>
+      <button onclick=handleSelectView()>Select View</button>
     </div>
 
     <div>
-      <label for='color'>Color by:</label>
-      <select id='select-color' name='color' class="ui fluid search dropdown">
+      <label>Color by Attribute:</label>
+      <select id='select-color' class="ui fluid search dropdown">
         <option value='kindred' selected>Kindred</option>
         <option value='sex'>Sex</option>
         <option value='deceased'>Deceased</option>
         <option value='gen'>Generation</option>
         <option value='suicide'>Suicide</option>
+        <option value='depression'>Depression</option>
       </select>
     </div>
 
     <div>
       <br>
-      <p>Filter by:</labpel>
-      <select id='select-kindred' class="ui fluid search dropdown" multiple>
-        <option value='' selected>Kindred</option>
-        <option value=38>38</option>
-        <option value=149>149</option>
-        <option value=27251>27251</option>
-        <option value=42623>42623</option>
-        <option value=68939>68939</option>
-        <option value=176860>176860</option>
-        <option value=603481>603481</option>
-        <option value=791533>791533</option>
-        <option value=903988>903988</option>
+      <p>Filter by Kindred:</labpel>
+        <select id='select-kindred' class="ui fluid search dropdown" multiple>
+          <option value='' selected>None</option>
+          <option value=38>38</option>
+          <option value=149>149</option>
+          <option value=27251>27251</option>
+          <option value=42623>42623</option>
+          <option value=68939>68939</option>
+          <option value=176860>176860</option>
+          <option value=603481>603481</option>
+          <option value=791533>791533</option>
+          <option value=903988>903988</option>
+        </select>
+    </div>
+
+    <div>
+      <label>Filter by Attribute:</label>
+      <select id='select-attribute' class="ui fluid search dropdown">
+        <option value='' selected>None</option>
+        <option value='sex'>Sex</option>
+        <option value='deceased'>Deceased</option>
+        <option value='suicide'>Suicide</option>
+        <option value='depression'>Depression</option>
       </select>
     </div>
 

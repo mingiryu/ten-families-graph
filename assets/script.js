@@ -9,16 +9,17 @@ var DATA;
 var ENABLE_PARTICLES = false;
 var COLOR_TYPE = 'kindred';
 
+var selectedNodes = new Set();
+var filteredKindreds = new Set();
+var filteredAttribute = '';
+
 
 fetch('./data/TenFamiliesGraph.json').then(res => res.json()).then(data => {
     DATA = data;
     const elem = document.getElementById('graph');
 
-    let hoverNode = null;
     const highlightNodes = new Set();
     const highlightLinks = new Set();
-
-    const selectedNodes = new Set();
 
     GRAPH = ForceGraph()(elem)
         .graphData(data)
@@ -35,7 +36,6 @@ fetch('./data/TenFamiliesGraph.json').then(res => res.json()).then(data => {
                 highlightNodes.add(node);
             }
 
-            hoverNode = node || null;
             elem.style.cursor = node ? '-webkit-grab' : null;
         })
         .onLinkHover(link => {
@@ -55,8 +55,12 @@ fetch('./data/TenFamiliesGraph.json').then(res => res.json()).then(data => {
         })
         .onNodeClick((node, event) => {
             // Center/zoom on node
-            GRAPH.centerAt(node.x, node.y, 1000);
-            GRAPH.zoom(1, 2000);
+            if (GRAPH.zoom() < 1) {
+                GRAPH.centerAt(node.x, node.y, 1000);
+                GRAPH.zoom(1, 2000);
+            } else {
+                GRAPH.centerAt(node.x, node.y, 1000);
+            }
 
             // Select multiple nodes
             if (event.ctrlKey || event.shiftKey || event.altKey) { // multi-selection
@@ -69,7 +73,7 @@ fetch('./data/TenFamiliesGraph.json').then(res => res.json()).then(data => {
 
             GRAPH.nodeColor(GRAPH.nodeColor()); // update color of selected nodes
 
-            updateTooltip(node, selectedNodes);
+            updateTable(node, selectedNodes);
         })
         .onNodeDrag((node, translate) => {
             if (selectedNodes.has(node)) { // moving a selected node
@@ -92,31 +96,34 @@ fetch('./data/TenFamiliesGraph.json').then(res => res.json()).then(data => {
 const getNodeColor = (node) => {
     if (COLOR_TYPE === 'sex') {
         if (node.sex === 'M') {
-            return 'blue'
+            return 'blue';
         } else {
-            return 'red'
+            return 'red';
         }
     } else if (COLOR_TYPE === 'deceased') {
         if (node.deceased === 'Y') {
-            return 'black';
+            return 'gray';
         } else {
-            return 'lime'
+            return 'lime';
         }
     } else if (COLOR_TYPE === 'suicide') {
         if (node.suicide === 'N') {
-            return 'black';
+            return 'gray';
         } else {
-            return 'lime'
+            return 'lime';
+        }
+    } else if (COLOR_TYPE === 'depression') {
+        if (node.depression) {
+            return 'lime';
+        } else {
+            return 'gray';
         }
     } else if (COLOR_TYPE === 'gen') {
-        const blues = d3.schemeBlues[9];
-        return blues[node.gen - 1]
+        return d3.schemeBlues[9][node.gen - 1];
     } else if (COLOR_TYPE === 'kindred') {
-        const accent = d3.schemeAccent;
-        return accent[KINDRED_IDS.indexOf(node.KindredID)]
+        return d3.schemeTableau10[KINDRED_IDS.indexOf(node.KindredID)];
     } else {
-        const accent = d3.schemeAccent;
-        return accent[node.group]
+        return d3.schemeBlues[9][0];
     }
 }
 
@@ -129,6 +136,50 @@ const getNodeShape = (node, ctx) => {
     ctx.fill();
 }
 
+
+const updateGraphData = () => {
+    if (filteredKindreds.size || filteredAttribute.length) {
+        let nodes = DATA['nodes'].slice();
+        let links = DATA['links'].slice();
+
+        // Filter by kindred
+        if (filteredKindreds.size && filteredKindreds.size < KINDRED_IDS.length) {
+            nodes = nodes.filter(d => filteredKindreds.has(d['KindredID']))
+            nodeIDs = new Set(nodes.map(d => d.id));
+            links = links.filter(d => nodeIDs.has(d['source']['id']) && nodeIDs.has(d['target']['id']))
+        }
+
+        // Filter by attribute
+        if (filteredAttribute.length) {
+            const toBool = ({
+                sex: {
+                    M: true,
+                    F: false
+                },
+                deceased: {
+                    Y: true,
+                    N: false,
+                },
+                suicide: {
+                    Y: true,
+                    N: false,
+                },
+                depression: {
+                    true: true,
+                    false: false,
+                }
+            });
+            nodes = nodes.filter(d => toBool[filteredAttribute][d[filteredAttribute]])
+            nodeIDs = new Set(nodes.map(d => d.id));
+            links = links.filter(d => nodeIDs.has(d['source']['id']) && nodeIDs.has(d['target']['id']))
+        }
+
+        GRAPH.graphData({ nodes, links });
+    } else {
+        GRAPH.graphData(DATA);
+    }
+}
+
 /** Event Handlers */
 
 const handleParticles = () => {
@@ -139,12 +190,12 @@ const handleParticles = () => {
 
 
 const handleZoomToFit = () => {
-    GRAPH.zoomToFit(1000)
+    GRAPH.zoomToFit(1000);
 }
 
 
 const handleColor = (value, text, $selectedItem) => {
-    COLOR_TYPE = value
+    COLOR_TYPE = value;
 }
 
 
@@ -152,25 +203,51 @@ const handleReheat = () => {
     GRAPH.d3ReheatSimulation()
 }
 
-
-const handleKindred = (value, text, $selectedItem) => {
-    value = new Set(value.map(v => +v));
-    if (value.size && value.size < KINDRED_IDS.length) {
-        nodes = DATA['nodes'].filter(d => value.has(d['KindredID']))
-        nodeIDs = new Set(nodes.map(d => d.id));
-        links = DATA['links'].filter(d => nodeIDs.has(d['source']['id']) && nodeIDs.has(d['target']['id']))
-        GRAPH.graphData({ nodes, links });
-    } else {
-        GRAPH.graphData(DATA);
-    }
+const handleSelectView = () => {
+    const data = GRAPH.graphData();
+    selectedNodes = new Set(data['nodes']);
+    updateTable(null, null);
 }
 
 
-const updateTooltip = (node, selectedNodes) => {
-    console.log(selectedNodes)
-    const tooltip = document.getElementById('tooltip');
-    const metadata = new Set(['id', '__indexColor', 'index', 'x', 'y', 'vx', 'vy'])
-    tooltip.innerHTML = Object.keys(node).map(key => node[key] && !metadata.has(key) ? `<p>${key}: ${node[key]}</p>` : '').join('');
+const handleKindred = (value, text, $selectedItem) => {
+    filteredKindreds = new Set(value.map(v => +v));
+    updateGraphData();
+}
+
+const handleAttribute = (value, text, $selectedItem) => {
+    filteredAttribute = value;
+    updateGraphData();
+}
+
+
+const updateTable = (node, selectedNodes) => {
+    const table = document.getElementById('table');
+
+    if (!node || !selectedNodes.size) {
+        table.style.display = 'none';
+    } else {
+        const info = document.getElementById('info');
+        const thead = document.getElementById('thead');
+        const tbody = document.getElementById('tbody');
+
+        const metadata = new Set(['id', '__indexColor', 'index', 'x', 'y', 'vx', 'vy'])
+        const tableKeys = Object.keys(node).filter(key => !metadata.has(key) && node[key]);
+        const tableHead = tableKeys.map(key => `<th>${key}</th>`);
+        const tableBody = [...selectedNodes].map(selectedNode => {
+            const tableCell = tableKeys.map(key => `<td data-label="${key}">${selectedNode[key]}</td>`);
+            return `<tr class="${node === selectedNode ? 'positive' : ''}">${tableCell.join('')}</tr>`;
+        })
+
+        if (info.style.display !== 'none' && selectedNodes.size == 1) {
+            info.innerText = 'Press shift, ctrl, or alt to select multiple nodes';
+        } else {
+            info.style.display = 'none';
+        }
+        table.style.display = 'block';
+        thead.innerHTML = `<tr>${tableHead.join('')}</tr>`;
+        tbody.innerHTML = tableBody.join('');
+    }
 }
 
 /** Semantic UI */
@@ -182,5 +259,13 @@ $('#select-color')
 
 $('#select-kindred')
     .dropdown({
-        onChange: handleKindred
+        onChange: handleKindred,
     });
+
+$('#select-attribute')
+    .dropdown({
+        onChange: handleAttribute,
+        clearable: true,
+    });
+
+$('table').tablesort()
