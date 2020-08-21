@@ -73,7 +73,7 @@ fetch('./data/TenFamiliesGraph.json').then(res => res.json()).then(data => {
 
             GRAPH.nodeColor(GRAPH.nodeColor()); // update color of selected nodes
 
-            updateTable(node, selectedNodes);
+            updateTable(node);
         })
         .onNodeDrag((node, translate) => {
             if (selectedNodes.has(node)) { // moving a selected node
@@ -204,9 +204,8 @@ const handleReheat = () => {
 }
 
 const handleSelectView = () => {
-    const data = GRAPH.graphData();
-    selectedNodes = new Set(data['nodes']);
-    updateTable(null, null);
+    selectedNodes = new Set(GRAPH.graphData()['nodes']);
+    updateTable([...selectedNodes][0]);
 }
 
 
@@ -221,10 +220,10 @@ const handleAttribute = (value, text, $selectedItem) => {
 }
 
 
-const updateTable = (node, selectedNodes) => {
+const updateTable = (node) => {
     const table = document.getElementById('table');
 
-    if (!node || !selectedNodes.size) {
+    if (!selectedNodes.size) {
         table.style.display = 'none';
     } else {
         const info = document.getElementById('info');
@@ -268,4 +267,5 @@ $('#select-attribute')
         clearable: true,
     });
 
-$('table').tablesort()
+$('table')
+    .tablesort()

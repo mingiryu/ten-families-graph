@@ -28,9 +28,24 @@ body {
     position: absolute;
     bottom: 0;
     margin: auto;
-    padding-bottom: 1em;
+    margin-bottom: 1em;
     opacity: 0.9;
+    max-height: 30vh;
+    max-width: 90vw;
+    overflow: auto;
 }
+
+table {
+    padding-right: 1em;
+    padding-left: 1em;
+}
+
+thead th {
+    position: sticky;
+    top: 0;
+}
+
+
 
 #control {
     z-index: 1000;
