@@ -291,6 +291,8 @@ const updateTable = (node) => {
         table.style.display = 'block';
         thead.innerHTML = `<tr>${tableHead.join('')}</tr>`;
         tbody.innerHTML = tableBody.join('');
+
+        $('table').tablesort();
     }
     updateInfo();
 }
@@ -329,9 +331,6 @@ $('#select-attribute')
         onChange: handleAttribute,
         clearable: true,
     });
-
-$('table')
-    .tablesort();
 
 $('.button')
     .popup();
