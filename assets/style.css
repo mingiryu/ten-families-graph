@@ -43,8 +43,6 @@ thead th {
     top: 0;
 }
 
-
-
 #control {
     z-index: 1000;
     position: absolute;
@@ -52,8 +50,4 @@ thead th {
     right: 0;
     margin: 1em;
     opacity: 0.9;
-}
-
-button {
-    display: block;
 }

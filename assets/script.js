@@ -12,6 +12,17 @@ var selectedNodes = new Set();
 var filteredKindreds = new Set();
 var filteredAttribute = '';
 
+const toBool = ({
+    deceased: {
+        Y: true,
+        N: false,
+    },
+    suicide: {
+        Y: true,
+        N: false,
+    },
+});
+
 
 fetch('./data/TenFamiliesGraph.json').then(res => res.json()).then(data => {
     DATA = data;
@@ -99,30 +110,22 @@ const getNodeColor = (node) => {
         } else {
             return 'HotPink';
         }
-    } else if (colorType === 'deceased') {
-        if (node.deceased === 'Y') {
-            return 'deeppink';
-        } else {
-            return 'gray';
-        }
-    } else if (colorType === 'suicide') {
-        if (node.suicide === 'Y') {
-            return 'deeppink';
-        } else {
-            return 'gray';
-        }
-    } else if (colorType === 'depression') {
-        if (node.depression) {
-            return 'deeppink';
-        } else {
-            return 'gray';
-        }
     } else if (colorType === 'gen') {
         return d3.schemeBlues[9][node.gen - 1];
     } else if (colorType === 'kindred') {
         return d3.schemeTableau10[KINDRED_IDS.indexOf(node.KindredID)];
+    } else if (toBool[colorType]) {
+        if (toBool[colorType][node[colorType]]) {
+            return 'deeppink';
+        } else {
+            return 'gray';
+        }
     } else {
-        return d3.schemeBlues[9][0];
+        if (node[colorType]) {
+            return 'deeppink';
+        } else {
+            return 'gray';
+        }
     }
 }
 
@@ -150,25 +153,15 @@ const updateGraphData = () => {
 
         // Filter by attribute
         if (filteredAttribute.length) {
-            const toBool = ({
-                sex: {
-                    M: true,
-                    F: false
-                },
-                deceased: {
-                    Y: true,
-                    N: false,
-                },
-                suicide: {
-                    Y: true,
-                    N: false,
-                },
-                depression: {
-                    true: true,
-                    false: false,
-                }
-            });
-            nodes = nodes.filter(d => toBool[filteredAttribute][d[filteredAttribute]])
+            if (filteredAttribute === "male") {
+                nodes = nodes.filter(d => d["sex"] === "M");
+            } else if (filteredAttribute === "female") {
+                nodes = nodes.filter(d => d["sex"] === "F");
+            } else if (toBool[filteredAttribute]) {
+               nodes = nodes.filter(d => toBool[filteredAttribute][d[filteredAttribute]]);
+            } else {
+                nodes = nodes.filter(d => d[filteredAttribute]);
+            }
             nodeIDs = new Set(nodes.map(d => d.id));
             links = links.filter(d => nodeIDs.has(d['source']['id']) && nodeIDs.has(d['target']['id']))
         }
