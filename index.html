@@ -2,7 +2,6 @@
 
   <link href="assets/style.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.0/semantic.min.css" rel="stylesheet">
-  <link href="assets/bonsai-base.min.css" rel="stylesheet">
 
   <script src="assets/force-graph.min.js"></script>
   <script src="assets/d3.v5.min.js"></script>
@@ -15,7 +14,10 @@
 
 <body>
   <div id="overlay-container">
-    <span id="info">Click on a node to view its attributes</span>
+    <div id="segment" class="ui raised segment">
+      <i class="info circle icon"></i>
+      <span id="info">Click on a node to view its attributes</span>
+    </div>
 
     <div id="table">
       <table class="ui celled table very compact sortable">
@@ -38,12 +40,49 @@
     </div>
   </div>
 
-  <div id='control'>
-    <div>
-      <button onclick=handleParticles()>Toggle Particles</button>
-      <button onclick=handleZoomToFit()>Zoom To Fit</button>
-      <button onclick=handleReheat()>Reheat Animation</button>
-      <button onclick=handleSelectView()>Select View</button>
+  <div id='control' class="circular ui icon button">
+    <i class="icon settings"></i>
+  </div>
+  <div class="ui flowing popup top left transition hidden">
+    <div style="display: flex; flex-direction: column;">
+      <div class="ui buttons">
+        <div id="particles" class="ui button" data-content="Particles" data-position="top center"
+          data-variation="basic small" onclick=handleParticles()>
+          <i class="ui icon ellipsis horizontal"></i>
+        </div>
+        <div class="or"></div>
+        <div id="arrows" class="ui positive button" data-content="Arrows" data-position="top center"
+          data-variation="basic small" onclick=handleArrows()>
+          <i class="ui icon arrows alternate horizontal"></i>
+        </div>
+      </div>
+
+      <div>
+        <div id="resume" class="ui icon button" data-content="Resume" data-position="top center"
+          data-variation="basic small" onclick=handleResume() style="display: none;">
+          <i class="ui icon play"></i>
+        </div>
+
+        <div id="pause" class="ui icon button" data-content="Pause" data-position="top center"
+          data-variation="basic small" onclick=handlePause()>
+          <i class="ui icon pause"></i>
+        </div>
+
+        <div class="ui icon button" data-content="Reheat" data-position="top center" data-variation="basic small"
+          onclick=handleReheat()>
+          <i class="ui icon forward"></i>
+        </div>
+
+        <div class="ui icon button" data-content="Zoom To Fit" data-position="top center" data-variation="basic small"
+          onclick=handleZoomToFit()>
+          <i class="ui icon expand arrows alternate"></i>
+        </div>
+
+        <div class="ui icon button" data-content="Select View" data-position="top center" data-variation="basic small"
+          onclick=handleSelectView()>
+          <i class="ui icon eye"></i>
+        </div>
+      </div>
     </div>
 
     <div>
@@ -59,20 +98,19 @@
     </div>
 
     <div>
-      <br>
-      <p>Filter by Kindred:</labpel>
-        <select id='select-kindred' class="ui fluid search dropdown" multiple>
-          <option value='' selected>None</option>
-          <option value=38>38</option>
-          <option value=149>149</option>
-          <option value=27251>27251</option>
-          <option value=42623>42623</option>
-          <option value=68939>68939</option>
-          <option value=176860>176860</option>
-          <option value=603481>603481</option>
-          <option value=791533>791533</option>
-          <option value=903988>903988</option>
-        </select>
+      <label>Filter by Kindred:</label>
+      <select id='select-kindred' class="ui fluid search dropdown" multiple>
+        <option value='' selected>None</option>
+        <option value=38>38</option>
+        <option value=149>149</option>
+        <option value=27251>27251</option>
+        <option value=42623>42623</option>
+        <option value=68939>68939</option>
+        <option value=176860>176860</option>
+        <option value=603481>603481</option>
+        <option value=791533>791533</option>
+        <option value=903988>903988</option>
+      </select>
     </div>
 
     <div>
@@ -85,10 +123,8 @@
         <option value='depression'>Depression</option>
       </select>
     </div>
-
-
-
   </div>
+
 
   <div id="graph"></div>
 </body>

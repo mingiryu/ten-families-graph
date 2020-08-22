@@ -1,14 +1,13 @@
 
 
 const KINDRED_IDS = [38, 149, 27251, 42623, 68939, 176860, 603481, 791533, 903988];
-
 const NODE_R = 10;
+const HIGHLIGHT_COLOR = "lime";
 
 var GRAPH;
 var DATA;
-var ENABLE_PARTICLES = false;
-var COLOR_TYPE = 'kindred';
 
+var colorType = 'kindred';
 var selectedNodes = new Set();
 var filteredKindreds = new Set();
 var filteredAttribute = '';
@@ -94,33 +93,33 @@ fetch('./data/TenFamiliesGraph.json').then(res => res.json()).then(data => {
 /** Force Graph Helpers */
 
 const getNodeColor = (node) => {
-    if (COLOR_TYPE === 'sex') {
+    if (colorType === 'sex') {
         if (node.sex === 'M') {
-            return 'blue';
+            return 'royalblue';
         } else {
-            return 'red';
+            return 'HotPink';
         }
-    } else if (COLOR_TYPE === 'deceased') {
+    } else if (colorType === 'deceased') {
         if (node.deceased === 'Y') {
-            return 'gray';
+            return 'deeppink';
         } else {
-            return 'lime';
-        }
-    } else if (COLOR_TYPE === 'suicide') {
-        if (node.suicide === 'N') {
             return 'gray';
-        } else {
-            return 'lime';
         }
-    } else if (COLOR_TYPE === 'depression') {
+    } else if (colorType === 'suicide') {
+        if (node.suicide === 'Y') {
+            return 'deeppink';
+        } else {
+            return 'gray';
+        }
+    } else if (colorType === 'depression') {
         if (node.depression) {
-            return 'lime';
+            return 'deeppink';
         } else {
             return 'gray';
         }
-    } else if (COLOR_TYPE === 'gen') {
+    } else if (colorType === 'gen') {
         return d3.schemeBlues[9][node.gen - 1];
-    } else if (COLOR_TYPE === 'kindred') {
+    } else if (colorType === 'kindred') {
         return d3.schemeTableau10[KINDRED_IDS.indexOf(node.KindredID)];
     } else {
         return d3.schemeBlues[9][0];
@@ -132,7 +131,7 @@ const getNodeShape = (node, ctx) => {
     // add ring just for highlighted nodes
     ctx.beginPath();
     ctx.arc(node.x, node.y, NODE_R * 1.4, 0, 2 * Math.PI, false);
-    ctx.fillStyle = 'black';
+    ctx.fillStyle = HIGHLIGHT_COLOR;
     ctx.fill();
 }
 
@@ -183,9 +182,48 @@ const updateGraphData = () => {
 /** Event Handlers */
 
 const handleParticles = () => {
-    ENABLE_PARTICLES = !ENABLE_PARTICLES;
-    (GRAPH.linkDirectionalParticles(ENABLE_PARTICLES ? 5 : 0)
-        .linkDirectionalArrowLength(ENABLE_PARTICLES ? 0 : 5));
+    const particles = document.getElementById("particles");
+    const arrows = document.getElementById("arrows");
+
+    if (![...particles.classList].includes("positive")) {
+        arrows.classList.toggle("positive");
+        particles.classList.toggle("positive");
+
+        (GRAPH.linkDirectionalParticles(5)
+            .linkDirectionalArrowLength(0));
+    }
+}
+
+
+const handleArrows = () => {
+    const arrows = document.getElementById("arrows");
+    const particles = document.getElementById("particles");
+
+    if (![...arrows.classList].includes("positive")) {
+        particles.classList.toggle("positive");
+        arrows.classList.toggle("positive");
+
+        (GRAPH.linkDirectionalParticles(0)
+            .linkDirectionalArrowLength(5));
+    }
+}
+
+
+const handleResume = () => {
+    const resume = document.getElementById("resume");
+    const pause = document.getElementById("pause");
+    resume.style.display = 'none';
+    pause.style.display = 'inline-block';
+    GRAPH.resumeAnimation();
+}
+
+
+const handlePause = () => {
+    const resume = document.getElementById("resume");
+    const pause = document.getElementById("pause");
+    resume.style.display = 'inline-block';
+    pause.style.display = 'none';
+    GRAPH.pauseAnimation();
 }
 
 
@@ -195,13 +233,14 @@ const handleZoomToFit = () => {
 
 
 const handleColor = (value, text, $selectedItem) => {
-    COLOR_TYPE = value;
+    colorType = value;
 }
 
 
 const handleReheat = () => {
     GRAPH.d3ReheatSimulation()
 }
+
 
 const handleSelectView = () => {
     selectedNodes = new Set(GRAPH.graphData()['nodes']);
@@ -226,7 +265,6 @@ const updateTable = (node) => {
     if (!selectedNodes.size) {
         table.style.display = 'none';
     } else {
-        const info = document.getElementById('info');
         const thead = document.getElementById('thead');
         const tbody = document.getElementById('tbody');
 
@@ -238,15 +276,28 @@ const updateTable = (node) => {
             return `<tr class="${node === selectedNode ? 'positive' : ''}">${tableCell.join('')}</tr>`;
         })
 
-        if (info.style.display !== 'none' && selectedNodes.size == 1) {
-            info.innerText = 'Press shift, ctrl, or alt to select multiple nodes';
-        } else {
-            info.style.display = 'none';
-        }
         table.style.display = 'block';
         thead.innerHTML = `<tr>${tableHead.join('')}</tr>`;
         tbody.innerHTML = tableBody.join('');
     }
+    updateInfo();
+}
+
+
+const updateInfo = () => {
+    const info = document.getElementById('info');
+    let text = '';
+
+    // Node counts
+    if (!selectedNodes.size) {
+        text = "Click on a node to view its attributes";
+    } else if (selectedNodes.size == 1) {
+        text = 'Press SHIFT, CTRL, or ALT to select multiple nodes';
+    } else {
+        text = `${selectedNodes.size} nodes selected`;
+    }
+
+    info.innerText = text;
 }
 
 /** Semantic UI */
@@ -268,4 +319,17 @@ $('#select-attribute')
     });
 
 $('table')
-    .tablesort()
+    .tablesort();
+
+$('.button')
+    .popup();
+
+$('#control')
+    .popup({
+        hoverable: true,
+        delay: {
+            show: 300,
+            hide: 800
+        }
+    });
+

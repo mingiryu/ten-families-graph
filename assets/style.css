@@ -1,5 +1,7 @@
 body {
     margin: 0;
+    background-color: "ivory";
+    overflow: hidden;
 }
 
 #overlay-container {
@@ -9,15 +11,11 @@ body {
     justify-content: center;
 }
 
-#info {
+#segment {
     z-index: 1000;
     position: absolute;
-    background: #5D5D5D;
     margin: 1em;
-    padding: 0.5em 1em;
-    border-radius: 1em;
     opacity: 0.9;
-    color: white;
 }
 
 #table {
@@ -30,7 +28,7 @@ body {
     margin: auto;
     margin-bottom: 1em;
     opacity: 0.9;
-    max-height: 30vh;
+    max-height: 25vh;
     max-width: 90vw;
     overflow: auto;
 }
@@ -53,12 +51,7 @@ thead th {
     top: 0;
     right: 0;
     margin: 1em;
-    padding:0.5em 1em 1em 1em;
-    border-radius: 1em;
     opacity: 0.9;
-    color: white;
-    background: #5D5D5D;
-    max-width: 300px;
 }
 
 button {
