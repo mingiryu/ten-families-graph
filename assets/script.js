@@ -268,13 +268,25 @@ const updateTable = (node) => {
         const thead = document.getElementById('thead');
         const tbody = document.getElementById('tbody');
 
-        const metadata = new Set(['id', '__indexColor', 'index', 'x', 'y', 'vx', 'vy'])
-        const tableKeys = Object.keys(node).filter(key => !metadata.has(key) && node[key]);
-        const tableHead = tableKeys.map(key => `<th>${key}</th>`);
+        const metadata = new Set(['id', '__indexColor', 'index', 'x', 'y', 'vx', 'vy', 'fx', 'fy'])
+        const tableKeys = Object.keys(node).filter(key => !metadata.has(key));
+        const tableValidKeys = new Set();
+
+        // Filter a set of valid table columns (inclusive)
+        [...selectedNodes].forEach(selectedNode => {
+            tableKeys.forEach(key => {
+                if (selectedNode[key]) {
+                    tableValidKeys.add(key);
+                }
+            });
+        })
+
         const tableBody = [...selectedNodes].map(selectedNode => {
-            const tableCell = tableKeys.map(key => `<td data-label="${key}">${selectedNode[key]}</td>`);
+            const tableCell = [...tableValidKeys].map(key => `<td data-label="${key}">${selectedNode[key]}</td>`);
             return `<tr class="${node === selectedNode ? 'positive' : ''}">${tableCell.join('')}</tr>`;
         })
+
+        const tableHead = [...tableValidKeys].map(key => `<th>${key}</th>`);
 
         table.style.display = 'block';
         thead.innerHTML = `<tr>${tableHead.join('')}</tr>`;
