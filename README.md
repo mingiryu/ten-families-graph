@@ -2,6 +2,10 @@
 
 Force graph visualization of 10 families with high incidence ratio of suicide cases in Utah.
 
+## Preview
+
+![pictures_splash](https://user-images.githubusercontent.com/40753283/91105575-fcf82f00-e635-11ea-9169-7f8e5813e510.png)
+
 ## Deployment (Local)
 
 1. Clone the repo.
