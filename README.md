@@ -1,6 +1,6 @@
 # ten-families-graph
 
-Force graph visualization of 10 families with high incidence ratio of suicide cases in Utah.
+Force graph visualization of 10 families with a high incidence suicide in Utah.
 
 ## Preview
 
